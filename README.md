@@ -12,7 +12,6 @@ cd /tmp/zimbra-tag-test
 
 git clone https://github.com/maldua/zimbra-tag-helper
 cd zimbra-tag-helper
-git clone https://github.com/Zimbra/zm-build.git
 ./zm-build-filter-tags-9.sh > tags_for_9.txt
 ```
 
@@ -30,7 +29,6 @@ cd /tmp/zimbra-tag-test
 
 git clone https://github.com/maldua/zimbra-tag-helper
 cd zimbra-tag-helper
-git clone https://github.com/Zimbra/zm-build.git
 ./zm-build-filter-tags-10.sh > tags_for_10.txt
 ```
 

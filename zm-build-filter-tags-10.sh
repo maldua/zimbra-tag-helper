@@ -18,6 +18,10 @@ MAIN_BRANCH="10.0"
 MAIN_BRANCH_PREFIX="${MAIN_BRANCH}."
 MAIN_BRANCH_ZERO_TAG="${MAIN_BRANCH_PREFIX}0"
 
+if [ ! -d "zm-build" ] ; then
+  git clone 'https://github.com/Zimbra/zm-build.git'
+fi
+
 # 0th step. Get zm-build tags
 cd zm-build
 git tag | grep -E '^'"${MAIN_BRANCH_PREFIX}" > ../${ZMBUILD_TAGS}
