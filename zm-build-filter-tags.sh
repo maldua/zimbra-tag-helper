@@ -51,7 +51,7 @@ done
 for nrepo in $(cat ${AGGREGATED_REPOS} | sort | uniq) ; do
   git clone $nrepo ${TAG_REPO_TMP_DIR}
   cd ${TAG_REPO_TMP_DIR}
-  git tag --format='%(creatordate:unix)%09%(refname:strip=2)' --sort=-taggerdate | awk '$2 ~ /^'${MAIN_BRANCH_PREFIX}'/ {print $1 " " $2}' | grep -v 'beta' | awk -v nrepo="$nrepo" '{print $1 " " $2 " " nrepo }'
+  git tag --format='%(creatordate:unix)%09%(refname:strip=2)' --sort=-taggerdate | awk '$2 ~ /^'${MAIN_BRANCH_PREFIX}'/ {print $1 " " $2}' | awk -v nrepo="$nrepo" '{print $1 " " $2 " " nrepo }'
   cd ..
   rm -rf ${TAG_REPO_TMP_DIR}
 done  >> ${TAGS_DETAILED_CSV}
