@@ -23,7 +23,6 @@ TAG_REPO_TMP_DIR="tagrepotmp_$$"
 # MAIN_BRANCH="10.0"
 MAIN_BRANCH=$(echo "${TAG}" | perl -pe 's|^(.*?)\.(.*?)\.(.*?)$|\1\.\2|')
 MAIN_BRANCH_PREFIX="${MAIN_BRANCH}."
-MAIN_BRANCH_ZERO_TAG="${MAIN_BRANCH_PREFIX}0"
 
 if [ ! -d "zm-build" ] ; then
   git clone 'https://github.com/Zimbra/zm-build.git'
@@ -61,12 +60,10 @@ for nUnsortedTag in $(cat ${TAGS_DETAILED_CSV} | awk '{print $2}' | sort | uniq)
     cat ${TAGS_DETAILED_CSV} | awk '$2 ~ /^'${nUnsortedTag}'$/ {print $1 " " $2}' | sort -r | head -n 1 >> ${TAGS_AND_NEWEST_DATE}
 done
 
-# 3rd step. Order by date (and remove main branch zero tag)
-# NOTE: We remove the original branch because its date its messed up.
+# 3rd step. Order by date
 
-cat ${TAGS_AND_NEWEST_DATE} | sort -k1 -r | awk '{print $2}' | grep -v -e '^'${MAIN_BRANCH_ZERO_TAG}'$' > ${TAGS_ORDERED_ITERATION_1}
-
-cat ${TAGS_ORDERED_ITERATION_1} ; echo ${MAIN_BRANCH_ZERO_TAG}
+cat ${TAGS_AND_NEWEST_DATE} | sort -k1 -r | awk '{print $2}' > ${TAGS_ORDERED_ITERATION_1}
+cat ${TAGS_ORDERED_ITERATION_1}
 
 # Remove tmp files
 rm ${ZMBUILD_TAGS}
