@@ -44,6 +44,9 @@ for nZmbuildTag in $(cat ${ZMBUILD_TAGS}); do
   perl zm-build-print-repos.pl >> ${AGGREGATED_REPOS}
 done
 
+# Also local zm-build repo
+echo "$(pwd)/zm-build" >> ${AGGREGATED_REPOS}
+
 # 1.2th step. Get aggregated repos tags
 
 # for nrepo in 'https://github.com/Zimbra/ant-1.7.0-ziputil-patched.git' 'https://github.com/Zimbra/ant-tar-patched.git' 'https://github.com/Zimbra/zm-mailbox.git' ; do
