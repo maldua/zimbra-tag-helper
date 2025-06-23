@@ -3,14 +3,22 @@
 #set -x
 #set -v
 
-if (( $# != 1 ))
-then
+usage () {
   echo "Usage:   $0 tag"
   echo "Example: $0 9.0.0.p26"
+
+  echo "Usage:   $0 tag pimbra-enabled"
+  echo "Example: $0 9.0.0.p26 pimbra-enabled"
+}
+
+TAG="$1" # E.g. 10.0.7p0
+PIMBRA_ENABLED="$2" # E.g. 'pimbra-enabled'
+
+if [ "x" == "x${TAG}" ] ; then
+  echo "TAG is not defined."
+  usage
   exit 1
 fi
-
-TAG=$1
 
 ZMBUILD_TAGS="zmbuild_tags_$$.txt"
 AGGREGATED_REPOS="aggregated_repos_$$.txt"
@@ -46,6 +54,18 @@ done
 
 # Also local zm-build repo
 echo "$(pwd)/zm-build" >> ${AGGREGATED_REPOS}
+
+# Add aggregated repos tags from Pimbra
+MALDUA_PIMBRA_CONFIG_GITHUB_URL="https://github.com/maldua-pimbra/maldua-pimbra-config"
+if [ "pimbra-enabled" == "${PIMBRA_ENABLED}" ] ; then
+  wget "${MALDUA_PIMBRA_CONFIG_GITHUB_URL}"'/raw/refs/tags/'"${TAG}"'/config.build' -O pimbra-tmp-config.build
+  PIMBRA_GITHUB_URL="$(cat pimbra-tmp-config.build | grep -v -E '^#' | grep 'GIT_OVERRIDES' | grep 'url-prefix' | awk -F '=' '{print $3}')"
+  # https://github.com/maldua-pimbra
+
+  for nmalduarepo in $(cat pimbra-tmp-config.build | grep -v -E '^#' | grep 'GIT_OVERRIDES' | grep 'remote' | sed 's/.remote.*//' | awk '{print $3}'); do
+    echo "${PIMBRA_GITHUB_URL}/${nmalduarepo}" >> ${AGGREGATED_REPOS}
+  done
+fi
 
 # 1.2th step. Get aggregated repos tags
 
