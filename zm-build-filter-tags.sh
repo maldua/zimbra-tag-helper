@@ -3,14 +3,15 @@
 #set -x
 #set -v
 
-if (( $# != 1 ))
-then
-  echo "Usage:   $0 tag"
+if (( $# < 1 )); then
+  echo "Usage:   $0 tag [pimbra-enabled]"
   echo "Example: $0 9.0.0.p26"
+  echo "Example: $0 9.0.0.p26 pimbra-enabled"
   exit 1
 fi
 
-TAG=$1
+TAG="$1"
+PIMBRA_ENABLED="$2"
 
 ZMBUILD_TAGS="zmbuild_tags_$$.txt"
 AGGREGATED_REPOS="aggregated_repos_$$.txt"
@@ -24,8 +25,14 @@ TAG_REPO_TMP_DIR="tagrepotmp_$$"
 MAIN_BRANCH=$(echo "${TAG}" | perl -pe 's|^(.*?)\.(.*?)\.(.*?)$|\1\.\2|')
 MAIN_BRANCH_PREFIX="${MAIN_BRANCH}."
 
+ZMBUILD_REPO_URL="https://github.com/Zimbra/zm-build.git"
+if [ "${PIMBRA_ENABLED}" == "pimbra-enabled" ]; then
+  ZMBUILD_REPO_URL="https://github.com/maldua-pimbra/zm-build.git"
+fi
+
 if [ ! -d "zm-build" ] ; then
-  git clone 'https://github.com/Zimbra/zm-build.git'
+  echo "Cloning zm-build from ${ZMBUILD_REPO_URL}..."
+  git clone "${ZMBUILD_REPO_URL}"
 fi
 
 # 0th step. Get zm-build tags

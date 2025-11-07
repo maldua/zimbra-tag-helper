@@ -23,7 +23,7 @@ fi
 PRE_FILTER_TAGS_FILE="$$-pre-filter-tags-file.txt"
 TAG_FOUND="NO"
 
-./zm-build-filter-tags.sh ${TAG} > ${PRE_FILTER_TAGS_FILE}
+./zm-build-filter-tags.sh ${TAG} ${PIMBRA_ENABLED} > ${PRE_FILTER_TAGS_FILE}
 ./zm-build-tags-arguments-from-file.sh ${TAG} ${PRE_FILTER_TAGS_FILE} ${PIMBRA_ENABLED}
 
 rm ${PRE_FILTER_TAGS_FILE}
