@@ -3,15 +3,54 @@
 #set -x
 #set -v
 
-if (( $# < 1 )); then
-  echo "Usage:   $0 tag [pimbra-enabled]"
-  echo "Example: $0 9.0.0.p26"
-  echo "Example: $0 9.0.0.p26 pimbra-enabled"
+function usage {
+cat << EOF
+Usage: $0 --tag <tag> [--pimbra-enabled] [--help|-h]
+
+Options:
+  --tag              Zimbra build tag to filter (required)
+  --pimbra-enabled   Use the PIMBRA fork of zm-build (optional)
+  -h, --help         Show this help message
+
+Examples:
+  $0 --tag 9.0.0.p26
+  $0 --tag 9.0.0.p26 --pimbra-enabled
+EOF
+}
+
+# Default values
+PIMBRA_ENABLED=false
+TAG=""
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --tag)
+      TAG="$2"
+      shift 2
+      ;;
+    --pimbra-enabled)
+      PIMBRA_ENABLED=true
+      shift
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Unknown argument: $1"
+      usage
+      exit 1
+      ;;
+  esac
+done
+
+# Validate required arguments
+if [ -z "${TAG}" ]; then
+  echo "Error: --tag is required."
+  usage
   exit 1
 fi
-
-TAG="$1"
-PIMBRA_ENABLED="$2"
 
 ZMBUILD_TAGS="zmbuild_tags_$$.txt"
 AGGREGATED_REPOS="aggregated_repos_$$.txt"
@@ -26,7 +65,7 @@ MAIN_BRANCH=$(echo "${TAG}" | perl -pe 's|^(.*?)\.(.*?)\.(.*?)$|\1\.\2|')
 MAIN_BRANCH_PREFIX="${MAIN_BRANCH}."
 
 ZMBUILD_REPO_URL="https://github.com/Zimbra/zm-build.git"
-if [ "${PIMBRA_ENABLED}" == "pimbra-enabled" ]; then
+if [ "${PIMBRA_ENABLED}" = true ]; then
   ZMBUILD_REPO_URL="https://github.com/maldua-pimbra/zm-build.git"
 fi
 
