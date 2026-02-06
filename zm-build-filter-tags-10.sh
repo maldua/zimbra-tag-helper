@@ -3,8 +3,36 @@
 #set -x
 #set -v
 
-# Usage
-# $0 > build_args_for_10.0.txt
+function usage {
+cat << EOF
+Usage: $0 [OPTIONS]
+
+Description:
+  Generates a comma-separated list of Zimbra 10.x build tags from zm-build and its repositories.
+
+Options:
+  -h, --help      Show this usage message and exit
+
+Output:
+  The script outputs a single line with all tags (main branch zero tag at the end) to stdout.
+  Example usage:
+    $0 > build_args_for_10.0.txt
+  Output example:
+    10.1.3,10.1.2,10.1.1,10.1.0
+EOF
+}
+
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    usage
+    exit 0
+fi
+
+# Check for invalid usage
+if [ "$#" -gt 0 ]; then
+    echo "Error: This script does not accept any arguments."
+    usage
+    exit 1
+fi
 
 ZMBUILD_TAGS="zmbuild_tags_$$.txt"
 AGGREGATED_REPOS="aggregated_repos_$$.txt"
