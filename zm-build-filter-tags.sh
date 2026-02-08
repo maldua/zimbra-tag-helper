@@ -5,22 +5,28 @@
 
 function usage {
 cat << EOF
-Usage: $0 --tag <tag> [--pimbra-enabled] [--help|-h]
+Usage: $0 --tag <tag> [--pimbra-enabled] [--verbose] [--help|-h]
 
 Options:
   --tag              Zimbra build tag to filter (required)
   --pimbra-enabled   Use the PIMBRA fork of zm-build (optional)
+  --verbose          Show more information (git clone / checkout not quiet)
   -h, --help         Show this help message
 
 Examples:
   $0 --tag 9.0.0.p26
   $0 --tag 9.0.0.p26 --pimbra-enabled
+  $0 --tag 9.0.0.p26 --verbose
 EOF
 }
 
 # Default values
 PIMBRA_ENABLED=false
+VERBOSE=false
 TAG=""
+
+# Git verbosity control
+GIT_QUIET_FLAGS="--quiet"
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
@@ -31,6 +37,11 @@ while [[ $# -gt 0 ]]; do
       ;;
     --pimbra-enabled)
       PIMBRA_ENABLED=true
+      shift
+      ;;
+    --verbose)
+      VERBOSE=true
+      GIT_QUIET_FLAGS=""
       shift
       ;;
     -h|--help)
@@ -71,7 +82,7 @@ fi
 
 if [ ! -d "zm-build" ] ; then
   echo "Cloning zm-build from ${ZMBUILD_REPO_URL}..."
-  git clone "${ZMBUILD_REPO_URL}"
+  git clone ${GIT_QUIET_FLAGS} "${ZMBUILD_REPO_URL}"
 fi
 
 # 0th step. Get zm-build tags
@@ -82,10 +93,9 @@ cd ..
 # 1st step. Get detailed CSV with all of the repo tags with their dates
 
 # 1.1th step. Get aggregated repos
-
 for nZmbuildTag in $(cat ${ZMBUILD_TAGS}); do
   cd zm-build
-  git checkout ${nZmbuildTag}
+  git checkout ${GIT_QUIET_FLAGS} ${nZmbuildTag}
   cd ..
   perl zm-build-print-repos.pl >> ${AGGREGATED_REPOS}
 done
@@ -97,7 +107,7 @@ echo "$(pwd)/zm-build" >> ${AGGREGATED_REPOS}
 
 # for nrepo in 'https://github.com/Zimbra/ant-1.7.0-ziputil-patched.git' 'https://github.com/Zimbra/ant-tar-patched.git' 'https://github.com/Zimbra/zm-mailbox.git' ; do
 for nrepo in $(cat ${AGGREGATED_REPOS} | sort | uniq) ; do
-  git clone $nrepo ${TAG_REPO_TMP_DIR}
+  git clone ${GIT_QUIET_FLAGS} $nrepo ${TAG_REPO_TMP_DIR}
   cd ${TAG_REPO_TMP_DIR}
   git tag --format='%(creatordate:unix)%09%(refname:strip=2)' --sort=-taggerdate | awk '$2 ~ /^'${MAIN_BRANCH_PREFIX}'/ {print $1 " " $2}' | awk -v nrepo="$nrepo" '{print $1 " " $2 " " nrepo }'
   cd ..
