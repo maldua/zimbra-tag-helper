@@ -78,10 +78,8 @@ sub PrintReposClone($$)
 
    $repo_url_prefix =~ s,/*$,,;
 
-   my $repo_details_remote = "";
-   $repo_details_remote = $repo_details->{remote} if (defined "$repo_details->{remote}");
-
-   if ( $repo_details_remote eq "" ) {
+   # Only print if repo_remote is "gh-zm" (Zimbra)
+   if ( $repo_remote eq "gh-zm" ) {
       print("$repo_url_prefix/$repo_name.git\n");
    }
 
